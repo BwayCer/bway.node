@@ -1,0 +1,3 @@
+-u bdd
+--require mocha/env.js
+

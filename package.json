@@ -4,7 +4,7 @@
   "description": "這是一個爪哇腳本語言為底建造的異步裝載平台。",
   "main": "lib/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "mocha": "mocha --opts mocha/mocha.opts"
   },
   "repository": {
     "type": "git",
