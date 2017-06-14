@@ -3,7 +3,7 @@ global.order = require( '../lib/initJS' );
 
 var [ log, devRegistry ]
     = require( '../lib/devBackdoor' )( {
-        log: order.cache[ '/bway/log' ],
+        log: order.cache[ '/pure/log' ],
         /* jspi */
     } );
 
