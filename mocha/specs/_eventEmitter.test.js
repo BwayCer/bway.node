@@ -1,14 +1,14 @@
 "use strict";
 
-// 爪哇腳本初始化
-let [ jspi, _log, initAMD, eventEmitter, classLog, cacher ] = require( '../../lib/initJS' ).initJS;
-let [ log, devRegistry ] = require( '../../lib/devBackdoor' )( _log, jspi );
-
+require( '../../lib/pure/jspi' );
+require( '../../lib/pure/eventEmitter' );
 
 describe( 'eventEmitter 事件發射員', function () {
     it( 'eventEmitter 是否載入', function () {
-        assert.notEqual( eventEmitter, null, 'eventEmitter 不存在。' );
+        assert.ok( '/pure/eventEmitter' in order.cache, '"/pure/eventEmitter" 模組不存在。' );
     } );
+
+    var eventEmitter = order.cache[ '/pure/eventEmitter' ];
 
     var rtnAns, insCobj;
     var evalFuncTxt = 'target[ 0 ]++;';
@@ -61,7 +61,7 @@ describe( 'eventEmitter 事件發射員', function () {
     describe( '#eventNames 事件名稱： 列出正監聽中的事件清單', function () {
         it( '取得不為原參考位置事件名稱', function () {
             rtnAns = insCobj.eventNames();
-            assert.notStrictEqual( rtnAns, insCobj._cacher._index, '不符合預期的參考位置。');
+            assert.notStrictEqual( rtnAns, insCobj._index, '不符合預期的參考位置。');
             assert.deepEqual( rtnAns, [ 'test' ], '不符合預期的回傳值。');
         } );
     } );
@@ -124,7 +124,7 @@ describe( 'eventEmitter 事件發射員', function () {
             var target = [ 0 ];
             insCobj.on( 'test', function () {
                 target[ 0 ]++;
-                var evtQueue = insCobj._cacher.pick( 'test' );
+                var evtQueue = insCobj._cache[ 'test' ];
                 evtQueue.splice( evtQueue.length - 1, 0, function () { target[ 0 ] = '干擾'; } );
             } );
             insCobj.on( 'test', function () {
@@ -199,7 +199,7 @@ describe( 'eventEmitter 事件發射員', function () {
         it( '確認單次監聽', function () {
             var refFunc = new Function;
             insCobj.once( 'testOnce', refFunc );
-            var evtQueue = insCobj._cacher.pick( 'testOnce' );
+            var evtQueue = insCobj._cache[ 'testOnce' ];
             assert.notStrictEqual( evtQueue[ 0 ], refFunc, '不符合預期。');
         } );
 
