@@ -1,0 +1,28 @@
+{
+  "name": "bwayjs",
+  "version": "0.0.0",
+  "description": "這是一個爪哇腳本語言為底建造的異步裝載平台。",
+  "main": "lib/index.js",
+  "scripts": {
+    "mocha": "mocha --opts mocha/mocha.opts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BwayCer/bway.node.git"
+  },
+  "keywords": [
+    "bway",
+    "pure",
+    "AMD"
+  ],
+  "author": "張本微 <bwaycer@gmail.com>",
+  "license": "CC-BY-4.0",
+  "bugs": {
+    "url": "https://github.com/BwayCer/bway.node/issues"
+  },
+  "homepage": "https://github.com/BwayCer/bway.node#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "benchmark": "^2.1.4"
+  }
+}
