@@ -6,6 +6,7 @@ Summary
 
 * [模組](content/module/README.md)
   * [實習服務生](content/module/intern_waiter.md)
+  * [超文本管理員](content/module/hyper_text_manager.md)
 
 
 ---
