@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: htf.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: htf.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*! HyperText Forward @license: CC-BY-4.0 - BwayCer (https://bwaycer.github.io/about/) */
+
+/**
+ * 超文本預告 HyperText Forward
+ *
+ * @file
+ * @author 張本微
+ * @license CC-BY-4.0
+ * @see [個人網站]{@link https://bwaycer.github.io/about/}
+ */
+
+
+order( [
+    '/pure/log',
+    '/pure/support',
+], function ( log, support ) {
+    "use strict";
+
+    /**
+     * 超文本預告
+     *
+     * @module htf
+     */
+
+    log.setMsg( {
+        htf_canNotCreateEltTag: 'Can\'t create element tag.',
+    } );
+
+    var _emptyEnum = support.emptyEnum;
+    var _arraySlice = Array.prototype.slice;
+
+    /**
+     * @memberof module:htf~
+     * @var {Boolean} isFormat - 是否格式化。 開發者除錯使用。
+     */
+    var isFormat = false;
+
+    /**
+     * @memberof module:htf~
+     * @var {Boolean} isPureText - 是否純文本。
+     * 以 `typeof global !== 'undefined'` 自動判斷。
+     */
+    var isPureText = typeof global !== 'undefined';
+
+    var _tag, _jcss;
+    var _initMarkHel, _setMarkHel;
+    var _createElement, _createNodeList;
+
+
+    var htf = new function htf() {};
+
+
+    /**
+     * @memberof module:htf~
+     * @namespace _docClass
+     */
+
+    // var _initMarkHel, _setMarkHel;
+    // var _createElement, _createNodeList;
+    void function () {
+        arguments[ isPureText ? 0 : 1 ]();
+        arguments[ 2 ]();
+    }(
+    function pureText() {
+        _initMarkHel = function ( objMarkHel ) {
+            objMarkHel.head = objMarkHel.head || '';
+            objMarkHel.main = objMarkHel.main || '';
+            objMarkHel.script = objMarkHel.script || '';
+            objMarkHel.tagIDs = objMarkHel.tagIDs || [];
+
+            return objMarkHel;
+        };
+
+        _setMarkHel = function ( objMarkHel, insMain ) {
+            var strElt;
+
+            switch ( insMain &amp;&amp; insMain.constructor ) {
+                case _createElement:
+                    if ( insMain._onCreate ) _setMarkHel_onCreateBindElt( objMarkHel, insMain );
+
+                    strElt = objMarkHel.main = insMain.elt();
+                    return strElt;
+                case _createNodeList:
+                    strElt = _setMarkHel_getNodeListEltString( insMain );
+                    if ( strElt == null ) break;
+
+                    objMarkHel.main = strElt;
+                    return insMain;
+            }
+
+            objMarkHel.main = null;
+            throw Error( log.err( 21, 'htf_canNotCreateEltTag' ) );
+        };
+
+        var _regexWordySpace = /\s+/g;
+
+        var _makeupFollowScript = isFormat
+            ? function ( strID, fnOnCreate ) {
+                return '(' + fnOnCreate.toString()
+                    + ').call( document.getElementById( "' + strID + '" ) );\n';
+            }
+            : function ( strID, fnOnCreate ) {
+                return '(' + fnOnCreate.toString().replace( _regexWordySpace, ' ' )
+                    + ').call( document.getElementById( "' + strID + '" ) ); ';
+            };
+
+        function _setMarkHel_onCreateBindElt( objMarkHel, insElement ) {
+            var followScript;
+            var strID = insElement._id;;
+
+            if ( !strID ) {
+                strID = 'HTMxR' + Math.random().toString().substr( -7 );
+                insElement.setAttribute( 'id', strID );
+                objMarkHel.tagIDs.push( strID );
+            }
+
+            objMarkHel.script += _makeupFollowScript( strID, insElement._onCreate );
+        }
+
+        function _setMarkHel_getNodeListEltString( insNodeList ) {
+            var idx, val, strElt;
+
+            for ( idx in insNodeList ) {
+                val = insNodeList[ idx ];
+
+                if ( typeof val !== 'string' ) return null;
+                strElt += val;
+            }
+
+            return strElt;
+        }
+
+        /**
+         * 創建元素： 見 {@link module:htf~_docClass._createElement} 。
+         *
+         * @memberof module:htf~_docClass._createElement.
+         * @func _createElement_pureText
+         */
+        _createElement = function createElement( strName ) {
+            this._name = strName;
+            this._id = null;
+            this._attrs = '';
+            this._dataset = '';
+            this._childs = '';
+            this._onCreate = null;
+        };
+
+        /**
+         * 設定屬性： 見 {@link module:htf~_docClass._createElement#setAttribute} 。
+         *
+         * @memberof module:htf~_docClass._createElement#
+         * @func setAttribute_pureText
+         */
+        _createElement.prototype.setAttribute = function ( strKey, strVal ) {
+            if ( strKey === 'id' ) this._id = strVal;
+            this._attrs += ' ' + strKey + '="' + strVal + '"';
+        };
+
+        var _regexUppercase = /([A-Z])/g;
+
+        /**
+         * 設定元素資料： 見 {@link module:htf~_docClass._createElement#dataset} 。
+         *
+         * @memberof module:htf~_docClass._createElement#
+         * @func dataset_pureText
+         */
+        _createElement.prototype.dataset = function ( objData ) {
+            var key;
+            var dataset = '';
+
+            for ( key in objData ) {
+                dataset += ' data-'
+                    + key.replace( _regexUppercase, '-$1' ).toLowerCase()
+                    + '="' + objData[ key ] + '"';
+            }
+
+            this._dataset = dataset;
+        };
+
+        var _increaseIndent = isFormat
+            ? function ( strChild ) {
+                return strChild.replace( /(.+)/gm, '    $1' );
+            }
+            : null;
+
+        /**
+         * 增加子元素： 見 {@link module:htf~_docClass._createElement#appendChild} 。
+         *
+         * @memberof module:htf~_docClass._createElement#
+         * @func appendChild_pureText
+         */
+        _createElement.prototype.appendChild = isFormat
+            ? function ( anyChild ) {
+                var idx, val, txtChild;
+
+                switch ( anyChild.constructor ) {
+                    case String:
+                        txtChild = _increaseIndent( anyChild ) + '\n';
+                        break;
+                    case _createNodeList:
+                        txtChild = '';
+
+                        for ( idx in anyChild ) {
+                            val = anyChild[ idx ];
+
+                            if ( typeof val !== 'string' ) {
+                                txtChild = null;
+                                break;
+                            }
+
+                            txtChild += _increaseIndent( val ) + '\n';
+                        }
+                        break;
+                }
+
+                if ( txtChild != null ) this._childs += txtChild;
+                else throw TypeError( log.err( 21, '_typeError' ) );
+            }
+            : function ( anyChild ) {
+                var idx, val, txtChild;
+
+                switch ( anyChild.constructor ) {
+                    case String:
+                        txtChild = anyChild;
+                        break;
+                    case _createNodeList:
+                        txtChild = '';
+
+                        for ( idx in anyChild ) {
+                            val = anyChild[ idx ];
+
+                            if ( typeof val !== 'string' ) {
+                                txtChild = null;
+                                break;
+                            }
+
+                            txtChild += val;
+                        }
+                        break;
+                }
+
+                if ( txtChild != null ) this._childs += txtChild;
+                else throw TypeError( log.err( 21, '_typeError' ) );
+            };
+
+        var _hasChildPreCharacter = isFormat ? '\n' : '';
+
+        /**
+         * @memberof module:htf~_docClass._createElement~
+         * @var {Array} _singleTag_pureText - 單標籤。
+         * 目前值為： `meta`, `br`, `hr`, `link`, `img`, `input`
+         */
+        var _singleTag = [ 'meta', 'br', 'hr', 'link', 'img', 'input' ];
+
+        /**
+         * 元素： 創建元素。
+         *
+         * @memberof module:htf~_docClass._createElement#
+         * @func elt_pureText
+         * @return {String}
+         */
+        _createElement.prototype.elt = function elt() {
+            var item, key;
+            var tagName = this._name;
+            var strAns = '';
+
+            strAns += '&lt;' + tagName + this._attrs + this._dataset;
+
+            if ( ~_singleTag.indexOf( tagName ) ) strAns += ' />';
+            else {
+                strAns += '>';
+
+                item = this._childs;
+                if ( item ) strAns += _hasChildPreCharacter + item;
+
+                strAns += '&lt;/' + this._name + '>';
+            }
+
+            return strAns;
+        };
+    },
+    function HyperText() {
+        /**
+         * 初始化標記標籤。
+         * &lt;br>
+         * &lt;br>
+         * markHel 規範：
+         * &lt;br>
+         * * 若 `isPureText === true`：
+         * &lt;br>
+         * &lt;pre>
+         * ```
+         * { head: 放於頭部段落的文字,
+         *   main: 放於身體段落的文字,
+         *   script: 用於設定元素標籤之程式碼 }
+         * ```
+         * &lt;/pre>
+         * * 若 `isPureText === false`：
+         * &lt;br>
+         * &lt;pre>
+         * ```
+         * { main: 主要輸出元素標籤（最後執行的）,
+         *   ...key: 追蹤之元素標籤 }
+         * ```
+         * &lt;/pre>
+         *
+         * @memberof module:htf~_docClass.
+         * @func _initMarkHel
+         * @param {Object} markHel
+         * @return {Object} 初始化的標記標籤
+         */
+        _initMarkHel = function ( objMarkHel ) {
+            objMarkHel.main = objMarkHel.main || null;
+
+            return objMarkHel;
+        };
+
+        /**
+         * 設定標記標籤： 依 `isPureText` 環境需求使用不同的設定方式。
+         *
+         * @memberof module:htf~_docClass.
+         * @func _setMarkHel
+         * @param {Object} markHel
+         * @param {(module:htf~_docClass._createElement|module:htf~_docClass._createNodeList)} main
+         * @throws {Error} 創建元素失敗。 (21, htf_canNotCreateEltTag)
+         * @return {module:htf~_docClass._createNodeList} 當 `main instanceof _createNodeList` 時。
+         * @return {String} 當 `isPureText === true` 時。
+         * @return {Element} 當 `isPureText === false` 時。
+         */
+        _setMarkHel = function ( objMarkHel, insMain ) {
+            var helElt;
+
+            switch ( insMain &amp;&amp; insMain.constructor ) {
+                case _createElement:
+                    helElt = objMarkHel.main = insMain.elt();
+                    if ( insMain._onCreate ) insMain._onCreate.call( helElt );
+                    return helElt;
+                case _createNodeList:
+                    objMarkHel.main = insMain;
+                    return insMain;
+            }
+
+            objMarkHel.main = null;
+            throw Error( log.err( 21, 'htf_canNotCreateEltTag' ) );
+        };
+
+
+        /**
+         * 創建元素： 若 `isPureText === true`，使用文字模式；
+         * 反之則使用 `document.createElement` 創建的元素標籤，
+         *
+         * @memberof module:htf~_docClass.
+         * @class _createElement
+         * @param {String} name - 元素名稱。
+         */
+        _createElement = function createElement( strName ) {
+            this._name = strName;
+            this._id = null;
+            this._attrs = new _emptyEnum();
+            this._dataset = null;
+            this._childs = [];
+            this._onCreate = null;
+        };
+
+        /**
+         * 設定屬性。
+         *
+         * @memberof module:htf~_docClass._createElement#
+         * @func setAttribute
+         * @param {String} key
+         * @param {String} val
+         */
+        _createElement.prototype.setAttribute = function ( strKey, strVal ) {
+            if ( strKey === 'id' ) this._id = strVal;
+            this._attrs[ strKey ] = strVal;
+        };
+
+        /**
+         * 設定元素資料： 設定元素專用的 `dataset`。
+         *
+         * @memberof module:htf~_docClass._createElement#
+         * @func dataset
+         * @param {Object} data
+         */
+        _createElement.prototype.dataset = function ( objData ) {
+            var key, dataset;
+
+            dataset = this._dataset = new _emptyEnum();
+
+            for ( key in objData ) dataset[ key ] = objData[ key ];
+        };
+
+        /**
+         * 增加子元素。
+         *
+         * @memberof module:htf~_docClass._createElement#
+         * @func appendChild
+         * @param {(String|Element|module:htf~_docClass._createNodeList)} child
+         * @throws {TypeError} 參數值類型不符合期待。 (21, _typeError)
+         */
+        _createElement.prototype.appendChild = function ( anyChild ) {
+            var childs = this._childs;
+
+            if ( typeof anyChild === 'string' ) childs.push( document.createTextNode( anyChild ) );
+            else if ( anyChild instanceof Element ) childs.push( anyChild );
+            else if ( anyChild.constructor !== _createNodeList
+                || !_appendNodeListChild( childs, anyChild ) ) {
+                throw TypeError( log.err( 21, '_typeError' ) );
+            }
+        };
+
+        function _appendNodeListChild( arrChilds, insNodeList ) {
+            var idx, val;
+
+            for ( idx in insNodeList ) {
+                val = insNodeList[ idx ];
+
+                if ( typeof val === 'string' ) arrChilds.push( document.createTextNode( val ) );
+                else if ( val instanceof Element ) arrChilds.push( val );
+                else return false;
+            }
+
+            return true;
+        }
+
+        var document = window.document;
+
+        /**
+         * 元素： 創建元素。
+         *
+         * @memberof module:htf~_docClass._createElement#
+         * @func elt
+         * @return {Element}
+         */
+        _createElement.prototype.elt = function elt() {
+            var item, key;
+            var helAns = document.createElement( this._name );
+
+            item = this._attrs;
+            for ( key in item ) helAns.setAttribute( key, item[ key ] );
+
+            item = this._dataset;
+            if ( item ) for ( key in item ) helAns.dataset[ key ] = item[ key ];
+
+            item = this._childs;
+            if ( item.length ) for ( key in item ) helAns.appendChild( item[ key ] );
+
+            return helAns;
+        };
+    },
+    function () {
+        /**
+         * 當創建時調用。
+         *
+         * @memberof module:htf~_docClass._createElement#
+         * @func onCreate
+         * @param {Function} onCreate
+         */
+        _createElement.prototype.onCreate = function ( fnOnCreate ) {
+            this._onCreate = fnOnCreate;
+        };
+
+
+        /**
+         * 創建節點清單： 以 `Object` 仿 `Array` 方式創建，與 `NodeList` 不同。
+         *
+         * @memberof module:htf~_docClass.
+         * @class _createNodeList
+         * @param {Array} args - 若子成員為 `undefined` 或 `null` 時將忽略。
+         */
+        _createNodeList = function _createNodeList( arrArgs ) {
+            var val;
+            var len = arrArgs.length;
+
+            while ( len-- ) {
+                val = arrArgs[ len ];
+                if ( val != null ) this[ len ] = val;
+            }
+        };
+    }
+    );
+
+
+    /**
+     * @memberof module:htf~
+     * @namespace _tag
+     */
+
+    // var _tag;
+    void function () {
+        /**
+         * 元素標籤： 取得元素標籤函式。
+         *
+         * @memberof module:htf~_tag.
+         * @func _tag
+         * @param {Object} markHel - 存放被標註的元素標籤的物件陣列。
+         * @return {Function}
+         */
+        _tag = function _tag( objMarkHel ) {
+            var fnT = t.bind( _initMarkHel( objMarkHel ) );
+            fnT.easyTag = _tag.easyTag;
+            fnT.nodeList = _tag.nodeList;
+            return fnT;
+        };
+
+        /**
+         * 簡易創建元素標籤。
+         *
+         * @memberof! module:htf~_tag.
+         * @alias _tag.easyTag
+         * @func  _tag.easyTag
+         * @param {String} tagName
+         * @return {(String|Element)}
+         */
+        _tag.easyTag = function easyTag( strTagName ) {
+            var insTag = new _createElement( strTagName );
+            return this( 'HYPERTEXT_setMarkHel', insTag );
+        };
+
+        /**
+         * 節點清單： 創建
+         * [`_createNodeList`]{@link module:htf~_docClass._createNodeList}
+         * 類型的清單。
+         *
+         * @memberof! module:htf~_tag.
+         * @alias _tag.nodeList
+         * @func  _tag.nodeList
+         * @param {...(String|Element)} childNode
+         * @return {module:htf~_docClass._createNodeList}
+         */
+        _tag.nodeList = function nodeList() {
+            var insNodeList = new _createNodeList( arguments );
+            return this( 'HYPERTEXT_setMarkHel', insNodeList );
+        };
+
+
+        /**
+         * 標籤： 創建元素標籤。
+         *
+         * @memberof module:htf~_tag~
+         * @func t
+         * @param {String} tagMark - 標籤與標記。
+         * @param {Object} [attr] - 元素標籤屬性。
+         * @param {Function} [onCreate] - 創建時事件。
+         * @param {...Element} [subElt] - 子層元素標籤。
+         * @return {(String|Element|module:htf~_docClass._createNodeList)}
+         * 見 {@link module:htf~_docClass._setMarkHel|_docClass._setMarkHel} 。
+         *
+         * @example
+         * t( 'div', { id: 'TxPostForm', onCreate: function () {
+         *         console.log( this.id );
+         *     } },
+         *     t( 'form*postForm', { className: 'whatName', action: '/postPage', method: 'post', enctype: 'multipart/form-data' },
+         *         t.nodeList(
+         *             'First name',
+         *             t( 'input', { type: 'text', name: 'fname' } ),
+         *             t.easyTag( 'br' )
+         *         ),
+         *         t.nodeList(
+         *             'Last name',
+         *             t( 'input', { type: 'text', name: 'lname' } ),
+         *             t.easyTag( 'br' )
+         *         ),
+         *         t( 'input', { type: 'submit', value: "Submit" } )
+         *     ),
+         *     t( 'div*tty', { dataset: { imHyperText: true, toMarkThisTag: 'tty' } },
+         *         function () {
+         *             this.className = 'TxTty';
+         *         }
+         *     )
+         * );
+         *
+         * // HTML
+         * // &lt;div id="TxPostForm">
+         * //     &lt;form class="whatName" action="/postPage" method="post" enctype="multipart/form-data">
+         * //         First name
+         * //         &lt;input type="text" name="fname" />
+         * //         &lt;br />
+         * //         Last name
+         * //         &lt;input type="text" name="lname" />
+         * //         &lt;br />
+         * //         &lt;input type="submit" value="Submit" />
+         * //     &lt;/form>
+         * //     &lt;div data-im-hyper-text="true" data-to-mark-this-tag="tty">&lt;/div>
+         * // &lt;/div>"
+         */
+        function t( strTagMark ) {
+            if ( strTagMark === 'HYPERTEXT_setMarkHel' )
+                return _setMarkHel( this, arguments[ 1 ] );
+
+            var anyAns;
+            var splitName = strTagMark.split( '*' );
+            var tagName = splitName[ 0 ];
+            var markName = splitName[ 1 ] || null;
+            var insMainElt = new _createElement( tagName );
+
+            _handleTag( insMainElt, arguments );
+            anyAns = _setMarkHel( this, insMainElt );
+
+            if ( markName ) this[ markName ] = this.main;
+
+            return anyAns;
+        }
+
+        /**
+         * 標籤處理。
+         *
+         * @memberof module:htf~_tag~
+         * @func _handleTag
+         * @param {module:htf~_docClass._createElement} mainElt - 當前主要的創建元素。
+         * @param {Array} args - 若子成員為 `null` 時將略過，其它允許值見
+         * {@link module:htf~_docClass._createElement.appendChild|_docClass._createElement.appendChild}。
+         */
+        function _handleTag( insMainElt, objArgs ) {
+            var idxArgs = 1;
+            var argVal = objArgs[ 1 ];
+            var lenArgs = objArgs.length;
+
+            if ( argVal &amp;&amp; argVal.constructor === Object ) {
+                _setAttr( insMainElt, argVal );
+                argVal = objArgs[ ++idxArgs ];
+            }
+
+            if ( typeof argVal === 'function' ) {
+                insMainElt.onCreate( argVal );
+                ++idxArgs;
+            }
+
+            while ( idxArgs &lt; lenArgs ) {
+                argVal = objArgs[ idxArgs++ ];
+
+                if ( argVal != null ) insMainElt.appendChild( argVal );
+            }
+        }
+
+        /**
+         * 設定屬性。
+         *
+         * @memberof module:htf~_tag~
+         * @func _setAttr
+         * @param {module:htf~_docClass._createElement} mainElt - 當前主要的創建元素。
+         * @param {Object} attr - 元素標籤屬性。
+         */
+        function _setAttr( insMainElt, objAttr ) {
+            var key, val;
+            for ( key in objAttr ) {
+                val = objAttr[ key ];
+
+                if ( val == null ) continue;
+                switch ( key ) {
+                    case 'id':        insMainElt.setAttribute( 'id', val ); break;
+                    case 'className': insMainElt.setAttribute( 'class', val ); break;
+                    case 'dataset':   insMainElt.dataset( val ); break;
+                    case 'onCreate':  insMainElt.onCreate( val ); break;
+                    default:          insMainElt.setAttribute( key, val );
+                }
+            }
+        }
+    }();
+
+    /**
+     * 元素標籤： 將爪哇腳本編寫的程式碼轉換成超文本標記標籤。
+     *
+     * @memberof module:htf.
+     * @func tag
+     * @param {Object} [markHel] - 存放被標註的元素標籤的物件陣列。
+     * @param {Function} operate - 製成操作。
+     * @return {(String|Element|module:htf~_docClass._createNodeList)}
+     * 類似 {@link module:htf~_docClass._setMarkHel|_docClass._setMarkHel}
+     * ，但當 `isPureText === true` 時一律為文字。
+     */
+    htf.tag = function tag( objMarkHel, fnOperate ) {
+        if ( typeof objMarkHel === 'function' ) {
+            fnOperate = objMarkHel;
+            objMarkHel = {};
+        }
+
+        fnOperate( _tag( objMarkHel ) );
+        return objMarkHel.main;
+    };
+
+
+    /**
+     * @memberof module:htf~
+     * @namespace _jcss
+     */
+
+    // var _jcss;
+    void function () {
+        var stopResolve = true;
+
+        /**
+         * 爪哇腳本樣式表： 將爪哇腳本編寫的程式碼轉換成樣式表格式。
+         *
+         * @memberof module:htf~_jcss.
+         * @func _jcss
+         * @param {Object} stylesheet - 爪哇腳本的樣式表。 是 `String` 與 `Object` 組成的物件陣列。
+         * @return {String} 若樣式表格式不符則回傳 `''` 空文字。
+         *
+         * @example
+         * _jcss( {
+         *     'body': {
+         *         margin: '0',
+         *     },
+         *
+         *     '.TxDiv': {
+         *         width: '100%',
+         *         height: '100%',
+         *
+         *         '&amp;_aLink': {
+         *             display: 'block',
+         *
+         *             'body.esPc &amp;': {
+         *                 display: 'none',
+         *             },
+         *         },
+         *     },
+         * } );
+         *
+         * // CSS
+         * // body {
+         * //     margin: '0';
+         * // }
+         * // .TxDiv {
+         * //     width: '100%';
+         * //     height: '100%';
+         * // }
+         * // .TxDiv_aLink {
+         * //     display: 'block';
+         * // }
+         * // body.esPc .TxDiv_aLink {
+         * //     display: 'none';
+         * // }
+         */
+        _jcss = function _jcss( objStylesheet ) {
+            if ( !objStylesheet || objStylesheet.constructor !== Object ) return '';
+
+            var key;
+            var subStyleValue = '';
+            var strAns = '';
+
+            stopResolve = false;
+
+            for ( key in objStylesheet ) {
+                subStyleValue = _objectStylesheet( '', key, objStylesheet[ key ] );
+                if ( stopResolve ) return '';
+                strAns = _cssCombine( strAns, subStyleValue );
+            }
+
+            stopResolve = true;
+
+            return strAns;
+        };
+
+        /**
+         * @memberof module:htf~_jcss~
+         * @var {Boolean} _gapPart - 間隔零件（格式化相關）。
+         */
+        var _gapPart = isFormat
+            ? [  true, '\n', ' {\n', '    ', ';\n',  '}' ]
+            : [ false,  ' ',   ' {',    ' ',   ';', ' }' ];
+        var _regexCommaGap = /, ?/g;
+
+        /**
+         * 物件陣列樣式表： 以迴圈式解析以物件陣列表達的巢狀樣式表。
+         *
+         * @memberof module:htf~_jcss~
+         * @func _objectStylesheet
+         * @param {Array} parentName - 父層標籤名稱。
+         * @param {String} name - 標籤名稱。
+         * @param {Object} stylesheet - 爪哇腳本的樣式表。 是 `String` 與 `Object` 組成的件陣列。
+         * @return {String} 若樣式表格式不符則回傳空文字（`''`）。
+         */
+        function _objectStylesheet( strParentName, strName, objStylesheet ) {
+            if ( !objStylesheet || objStylesheet.constructor !== Object ) {
+                stopResolve = true;
+                return '';
+            }
+
+            var key, val;
+            var myName = _jcssSelector( strParentName, strName );
+            var styleValue = '';
+            var subStyleValue = '';
+            var newSubStyleValue = '';
+            var gapPart3 = _gapPart[ 3 ];
+            var gapPart4 = _gapPart[ 4 ];
+
+            for ( key in objStylesheet ) {
+                val = objStylesheet[ key ];
+
+                if ( typeof val === 'string' )
+                    styleValue += gapPart3 + _styleProp( key ) + ': ' + val + gapPart4;
+                else {
+                    newSubStyleValue = _objectStylesheet( myName, key, val );
+                    if ( stopResolve ) return '';
+                    subStyleValue = _cssCombine( subStyleValue, newSubStyleValue );
+                }
+            }
+
+            if ( styleValue ) {
+                if ( _gapPart[ 0 ] ) myName = myName.replace( _regexCommaGap, ',\n' );
+                styleValue = myName + _gapPart[ 2 ] + styleValue + _gapPart[ 5 ];
+            }
+
+            return _cssCombine( styleValue, subStyleValue );
+        }
+
+        /**
+         * 樣式表結合。
+         *
+         * @memberof module:htf~_jcss~
+         * @func _cssCombine
+         * @param {String} prevSection - 上半部樣式表。
+         * @param {String} nextSection - 下半部樣式表。
+         * @return {String}
+         */
+        function _cssCombine( strPrevSection, strNextSection ){
+            var gapWord = ( strPrevSection &amp;&amp; strNextSection ) ? _gapPart[ 1 ] : '';
+            return strPrevSection + gapWord + strNextSection;
+        }
+
+        // 測試每次創建正規表示法和取用範圍鏈的速度比為 6 : 7
+        // 取用範圍鏈略快些
+        var _regexSymbol = /&amp;/g;
+        var _regexSublayer = />/g;
+        var _regexWordySpace = /  +/g;
+        var _regexSpaceOnSide = /(^ | $)/g;
+
+        /**
+         * 爪哇腳本樣式表選擇器： 將 `&amp;` 字符替換成父層名和格式化。
+         *
+         * @memberof module:htf~_jcss~
+         * @func _jcssSelector
+         * @param {String} parentName - 父層名稱。
+         * @param {String} name - 標籤名稱。
+         * @return {String}
+         */
+        function _jcssSelector( strParentName, strName ) {
+            var strAns = strName
+                .replace( _regexSublayer, ' > ' )
+                .replace( _regexWordySpace, ' ' ).replace( _regexSpaceOnSide, '' );
+
+            return !strParentName
+                ? strAns
+                : _regexSymbol.test( strAns )
+                ? strAns.replace( _regexSymbol, strParentName )
+                : strParentName + ' ' + strAns;
+        }
+
+        var _regexUppercase = /([A-Z])/g;
+
+        /**
+         * 樣式屬性名稱： 將每個大寫字轉換成 橫槓（`-`） + 小寫。
+         *
+         * @memberof module:htf~_jcss~
+         * @func _styleProp
+         * @param {String} prop - 屬性名稱。
+         * @return {String}
+         */
+        function _styleProp( strProp ) {
+            return _regexUppercase.test( strProp )
+                ? strProp.replace( _regexUppercase, '-$1' ).toLowerCase()
+                : strProp;
+        }
+    }();
+
+    /**
+     * 樣式元素標籤： 將爪哇腳本編寫的程式碼轉換成樣式表，並輸出樣式元素標籤。
+     *
+     * @memberof module:htf.
+     * @func tagStyle
+     * @param {(Object|Function)} stylesheet - 爪哇腳本的樣式表。 是 `String` 與 `Object` 組成的物件陣列。
+     * @return {(String|Element)}
+     */
+    htf.tagStyle = function jcss( anyStylesheet ) {
+        var helStyle;
+        var objStylesheet;
+
+        switch ( typeof anyStylesheet ) {
+            case 'object': objStylesheet = anyStylesheet; break;
+            case 'function':
+                anyStylesheet( function jcss( objCallbackStylesheet ) {
+                    objStylesheet = objCallbackStylesheet;
+                } );
+                break;
+        }
+
+        helStyle = new _createElement( 'style' );
+        helStyle.appendChild( _jcss( objStylesheet ) );
+        return helStyle.elt();
+    };
+
+    return htf;
+} );
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-htf.html">htf</a></li></ul><h3>Classes</h3><ul><li><a href="module-htf-_docClass._createElement.html">_createElement</a></li><li><a href="module-htf-_docClass._createNodeList.html">_createNodeList</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-htf-_docClass.html">_docClass</a></li><li><a href="module-htf-_jcss.html">_jcss</a></li><li><a href="module-htf-_tag.html">_tag</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Sat Jun 17 2017 21:52:25 GMT+0800 (CST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
