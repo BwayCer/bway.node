@@ -2,7 +2,7 @@
   "name": "bwayjs",
   "version": "0.0.0",
   "description": "這是一個爪哇腳本語言為底建造的異步裝載平台。",
-  "main": "lib/index.js",
+  "main": "lib/nodeWaiter.js",
   "scripts": {
     "mocha": "mocha --opts mocha/mocha.opts"
   },
