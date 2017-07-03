@@ -29,6 +29,7 @@
 
 
 * [初始化爪哇腳本文件](#初始化爪哇腳本文件)
+* [節點服務生](#節點服務生)
 * [超文本預告文件](#超文本預告文件)
 
 
@@ -43,6 +44,26 @@
     <ul>
         <li>連結：
             <a href="/mmrepo/jsdoc/initJS" target="_blank">/mmrepo/jsdoc/initJS</a>
+        </li>
+        <li>來源： 無</li>
+        <li>使用頁面：
+            <a href="/content/module/intern_waiter.md">實習服務生</a>
+        </li>
+    </ul>
+</div>
+
+
+
+## 節點服務生
+
+
+<div class="imgInfo">
+    <a href="/mmrepo/jsdoc/nodeWaiter" target="_blank">
+        <img src="/mmrepo/jsdoc_comment.jpg" />
+    </a>
+    <ul>
+        <li>連結：
+            <a href="/mmrepo/jsdoc/nodeWaiter" target="_blank">/mmrepo/jsdoc/nodeWaiter</a>
         </li>
         <li>來源： 無</li>
         <li>使用頁面：
