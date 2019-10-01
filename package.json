@@ -23,6 +23,7 @@
   "homepage": "https://github.com/BwayCer/bway.node#readme",
   "dependencies": {},
   "devDependencies": {
-    "benchmark": "^2.1.4"
+    "benchmark": "^2.1.4",
+    "eslint-config-google": "^0.9.1"
   }
 }
