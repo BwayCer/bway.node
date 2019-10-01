@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <title>純命令開發測試工具</title>
+
+</head>
+
+<body>
+
+    <script src="../lib/initJS.js"></script>
+    <script src="../lib/pureCommand.js"></script>
+    <script>
+        var url_qsImport = location.search.match( /(?:\?|&)?import=([^&]+)/ );
+        if ( url_qsImport ) {
+            var helImportScript = document.createElement( 'script' );
+            helImportScript.src = url_qsImport[ 1 ];
+            document.body.appendChild( helImportScript );
+        }
+    </script>
+
+</body>
+
+</html>

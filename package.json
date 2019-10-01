@@ -4,6 +4,7 @@
   "description": "這是一個爪哇腳本語言為底建造的異步裝載平台。",
   "main": "lib/nodeWaiter.js",
   "scripts": {
+    "jsdoc": "rm -rf out/; node.jsdoc lib/; node.lightSever out/ -p 8084",
     "mocha": "mocha --opts mocha/mocha.opts"
   },
   "repository": {
